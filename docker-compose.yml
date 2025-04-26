@@ -1,0 +1,52 @@
+# docker-compose.yml
+version: '3.8'
+services:
+    api-gateway:
+        build: ./cmd/api-gateway
+        ports:
+            - '8080:8080'
+        depends_on:
+            - auth
+            - content
+            - user
+            - search
+
+    auth:
+        build: ./cmd/auth
+        ports:
+            - "8081:8081"
+        environment:
+            - DB_HOST=postgres
+            - REDIS_HOST=redis
+        depends_on:
+            - postgres
+            - redis
+
+    content:
+        build: ./cmd/content
+        environment:
+            - DB_HOST=postgres
+            - ELASTICSEARCH_HOST=elasticsearch
+
+    user:
+        build: ./cmd/user
+        environment:
+            - DB_HOST=postgres
+
+    search:
+        build: ./cmd/search
+        environment:
+            - ELASTICSEARCH_HOST=elasticsearch
+
+    postgres:
+        image: postgres:latest
+        environment:
+            - POSTGRES_USER=admin
+            - POSTGRES_PASSWORD=secret
+            - POSTGRES_DB=learning_platform
+
+    redis:
+        image: redis:latest
+
+    elasticsearch:
+        image: elasticsearch:latest
