@@ -1,52 +1,36 @@
-# docker-compose.yml
-version: '3.8'
 services:
-    api-gateway:
-        build: ./cmd/api-gateway
-        ports:
-            - '8080:8080'
-        depends_on:
-            - auth
-            - content
-            - user
-            - search
-
     auth:
-        build: ./cmd/auth
+        build:
+            context: .
+            dockerfile: auth-service/cmd/Dockerfile
         ports:
-            - "8081:8081"
+            - '1234:1234'
         environment:
             - DB_HOST=postgres
-            - REDIS_HOST=redis
+            - DB_PORT=5432
+            - DB_USER=admin
+            - DB_PASSWORD=123a@
+            - DB_NAME=learning_platform
+            - AUTH_SERVER_PORT=1234
         depends_on:
-            - postgres
-            - redis
-
-    content:
-        build: ./cmd/content
-        environment:
-            - DB_HOST=postgres
-            - ELASTICSEARCH_HOST=elasticsearch
-
-    user:
-        build: ./cmd/user
-        environment:
-            - DB_HOST=postgres
-
-    search:
-        build: ./cmd/search
-        environment:
-            - ELASTICSEARCH_HOST=elasticsearch
+            postgres:
+                condition: service_healthy
 
     postgres:
-        image: postgres:latest
+        image: postgres:17-alpine
+        ports:
+            - '5432:5432'
         environment:
             - POSTGRES_USER=admin
-            - POSTGRES_PASSWORD=secret
+            - POSTGRES_PASSWORD=123a@
             - POSTGRES_DB=learning_platform
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U admin -d learning_platform']
+            interval: 5s
+            timeout: 5s
+            retries: 5
 
-    redis:
-        image: redis:latest
-
-    elasticsearch:
-        image: elasticsearch:latest
+volumes:
+    postgres_data:

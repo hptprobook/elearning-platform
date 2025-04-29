@@ -12,8 +12,9 @@ This project is a Golang-based microservice architecture designed to provide sca
 - **Dockerized**: Services are containerized for easy deployment.
 
 ## Prerequisites
-- Go 1.21 or higher
+- Go 1.24
 - Docker and Docker Compose
+- Microservice
 - [Database, e.g., PostgreSQL] installed or running in a container
 - [Optional: any other tools, e.g., Kubernetes, make]
 
